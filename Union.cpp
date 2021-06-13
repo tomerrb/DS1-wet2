@@ -79,7 +79,11 @@ void Union::Agency::UniteAgencies(Union::Agency* agency) {
 	this->find()->Unite(agency->find());
 }
 
-int Union::Agency::GetIthSoldType(int i) {
+int Union::Agency::GetIthSoldTypeNew(int i) {
 	doubleInt copy = final_tree.get_ith_value(i);
 	return copy.get_number();
+}
+
+int Union::Agency::GetIthSoldType(int i) {
+	return this->find()->GetIthSoldTypeNew(i);
 }
