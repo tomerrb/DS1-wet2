@@ -22,7 +22,6 @@ StatusType CarDealershipManager::AddAgency() {
 		agency = (Union::Agency**)realloc(agency, sizeof(Union::Agency*) * max_size);
 		if (!agency)
 			return ALLOCATION_ERROR;
-
 	}
 	Union::Agency* new_agency = new Union::Agency();
 	agency[current_size] = new_agency;
@@ -36,6 +35,24 @@ StatusType CarDealershipManager::SellCar(int agencyID, int typeID, int k) {
 	agency[agencyID]->SellCar(typeID, k);
 	return SUCCESS;
 }
+
+StatusType CarDealershipManager::UniteAgencies(int agencyID1, int agencyID2) {
+	if (agencyID1 >= current_size || agencyID2 >= current_size)
+		return FAILURE;
+	agency[agencyID1]->UniteAgencies(agency[agencyID2]);
+	return SUCCESS;
+}
+
+StatusType CarDealershipManager::GetIthSoldType(int agencyID, int i, int* res) {
+	if (agencyID >= current_size)
+		return FAILURE;
+	res[0] = agency[agencyID]->GetIthSoldType(i);
+	return SUCCESS;
+}
+
+
+
+
 
 
 
