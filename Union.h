@@ -50,7 +50,7 @@ namespace Union {
 		void UniteAgencies(Agency* agency);
 		void Unite(Agency* agency);
 		int GetIthSoldType(int i);
-
+		int GetIthSoldTypeNew(int i);
 	};
 	
 	
