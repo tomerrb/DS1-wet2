@@ -58,5 +58,6 @@ StatusType GetIthSoldType(void* DS, int agencyID, int i, int* res) {
 	return ((CarDealershipManager*)DS)->GetIthSoldType(agencyID, i, res);
 }
 void Quit(void** DS) {
-	
+	delete (CarDealershipManager*)(*DS);
+	*DS = nullptr;
 }
