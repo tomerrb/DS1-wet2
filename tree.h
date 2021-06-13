@@ -101,8 +101,12 @@ private:
 		return node->parent;
 	}
 
-	V& get_value_new(Node* node) {
-		return node->value;
+	V& get_value_new(Node* node, const K& key) const{
+
+		if (compare(node->key, key) == 0)
+			return node->value;
+
+		return compare(node->key, key) > 0 ? get_value_new(node->left, key) : get_value_new(node->right, key);
 	}
 
 	void insert_fix(Node* node, Node* son, Node* grandson)
@@ -432,9 +436,9 @@ Tree():
 	{
 		return get_parent_new(root);
 	}
-	V& get_value()
+	V& get_value(const K& key) const
 	{
-		return get_value_new(root);
+		return get_value_new(root, key);
 	}
 
 
