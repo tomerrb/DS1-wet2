@@ -1,7 +1,8 @@
 
-#include "tree.h"
-
+#ifndef LIBRARY2_H
+#define LIBRARY2_H
 #include "library2.h"
+#endif
 
 #include "Union.h"
 
@@ -13,7 +14,7 @@
 
 class CarDealershipManager
 {
-	Union** agency;
+	Union::Agency** agency;
 	int max_size;
 	int current_size;
 	
@@ -31,8 +32,6 @@ public:
 	StatusType UniteAgencies(int agencyID1, int agencyID2);
 
 	StatusType GetIthSoldType(int agencyID, int i, int* res);
-
-	void Quit();
 
 };
 
