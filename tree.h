@@ -19,6 +19,8 @@ public:
 		Node* right;
 		Node* parent;
 		int height;
+		int left_num;
+		int right_num;
 
 		Node(const K& key, const V& value)
 			: key(key)
@@ -29,6 +31,8 @@ public:
 			, right(nullptr)
 			, parent(nullptr)
 			, height(1)
+			, left_num(0)
+			, right_num(0)
 		{
 		}
 
@@ -55,8 +59,15 @@ private:
 		Node* rotation = node->right;
 		Node* rotation1 = rotation->left;
 
+		int copy1 = node->left_num;
+		int copy2 = rotation->left_num;
+
 		rotation->left = node;
 		node->right = rotation1;
+
+		node->right_num = copy2;
+		rotation->left_num = copy1 + copy2 + 1;
+
 		if (rotation1) {
 			rotation1->parent = node;
 		}
@@ -74,9 +85,16 @@ private:
 	{
 		Node* rotation = node->left;
 		Node* rotation1 = rotation->right;
+
+		int copy1 = node->right_num;
+		int copy2 = rotation->right_num;
 		
 		rotation->right = node;
 		node->left = rotation1;
+
+		node->left_num = copy2;
+		rotation->right_num = copy1 + copy2 + 1;
+
 		if (rotation1) {
 			rotation1->parent = node;
 		}
@@ -187,9 +205,11 @@ private:
 		}
 
 		if (compare(node->key, key) <= 0) {
+			node->right_num++;
 			return insert_new(node, node->right, key, value);
 		}
 		else {
+			node->left_num++;
 			return insert_new(node, node->left, key, value);
 		}
 	}
@@ -208,6 +228,21 @@ private:
 			return true;
 
 		return compare(node->key, key) > 0 ? contains_r(node->left, key) : contains_r(node->right, key);
+	}
+
+	Node* first_element(Node* node) {
+		if (node->left == nullptr)
+			return node;
+		return first_element(node->left);
+	}
+
+	K& get_ith_value_new(Node* node, int i)
+	{
+		if (node->left_num >= i)
+			return get_ith_value_new(node->left, i);
+		if (i == node->left_num)
+			return node->key;
+		return get_ith_value_new(node->right, i - 1 - node->left_num);
 	}
 
 	Node* get_new(Node* node, const K& key) const
@@ -340,6 +375,9 @@ private:
 	}
 
 
+	
+
+
 public:
 	
 Tree(Compare* cmp)
@@ -400,11 +438,13 @@ Tree():
 				remove_node(parent, node, key);
 				break;
 			}
-			else if (node->key > key) {
+			else if (compare(node->key,key) > 0) {
+				node->left_num = node->left_num - 1;
 				parent = node;
 				node = node->left;
 			}
 			else {
+				node->right_num = node->right_num - 1;
 				parent = node;
 				node = node->right;
 			}
@@ -419,9 +459,15 @@ Tree():
 	}
 
 
+
+
 	Node* get(const K& key) 
 	{
 		return get_new(root, key);
+	}
+
+	Node* get_root() {
+		return root;
 	}
 
 	Node* get_right() 
@@ -441,6 +487,9 @@ Tree():
 		return get_value_new(root, key);
 	}
 
+	K& get_ith_value(int i) {
+		return get_ith_value_new(root, i);
+	}
 
 	bool smallest(const K& key) const
 	{
@@ -452,6 +501,17 @@ Tree():
 	{
 		return nearest_new(root, root, 1, key);
 	}
+
+	Tree<K,V> unite(Tree<K, V> tree1, Tree<K, V> tree2) {
+		return unite_r(tree1.get_root(), tree2.get_root());
+	}
+};
+
+template<typename K, typename V>
+Tree<K, V> unite(Tree<K, V> tree1, Tree<K, V> tree2) {
+	Tree<K, V> new_tree = Tree<K, V>(tree1.compare);
+	
+	return new_tree;
 };
 
 
