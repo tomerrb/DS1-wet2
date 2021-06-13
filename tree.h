@@ -502,9 +502,7 @@ Tree():
 		return nearest_new(root, root, 1, key);
 	}
 
-	Tree<K,V> unite(Tree<K, V> tree1, Tree<K, V> tree2) {
-		return unite_r(tree1.get_root(), tree2.get_root());
-	}
+	
 };
 
 template<typename K, typename V>
