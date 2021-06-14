@@ -506,11 +506,49 @@ Tree():
 };
 
 template<typename K, typename V>
+Tree<K, V> uniteRec(Tree<K,V> merged ,Tree<K, V> tree1, Tree<K, V> tree2, typename Tree<K, V>::Node* current1, typename Tree<K,V>::Node* current2)
+{
+	if (!current1 || !current2)
+	{
+		return merged;
+	}
+	if (current1->left!=nullptr)
+	{
+		merged= uniteRec(merged, tree1, tree2, current1->left, current2);
+	}
+	if (current2->left!= nullptr)
+	{
+		merged= uniteRec(merged, tree1, tree2, current1, current2->left)
+	}
+	if (merged.compare(current1, current2) < 0)
+	{
+		
+	}
+}
+
+template<typename K, typename V>
 Tree<K, V> unite(Tree<K, V> tree1, Tree<K, V> tree2) {
 	Tree<K, V> new_tree = Tree<K, V>(tree1.compare);
+	Node* current1= tree1->smallest;
+	Node* current2= tree2->smallest;
+	Node* last1= current1;
+	Node* last2= current2;
+	while ((current1 != tree1->biggest) || (current2 != tree2->biggest))
+	{
+		int is_bigger=new_tree.compare(current1->key, current2->key);
+		if (is_bigger>0)
+		{
+			new_tree.insert(current2->key,current2->value);
+			last2=current2;
+			current2=current2->parent;
+		}
+	}
+	
 	
 	return new_tree;
 };
+
+
 
 
 #endif
