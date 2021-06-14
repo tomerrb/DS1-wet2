@@ -519,20 +519,20 @@ typename Tree<K,V>::Node** treeToArr (Tree<K,V> tree, int counter, typename Tree
 {
 	if (!current)
 	{
-		return;
+		return nullptr;
 	}
 	if (current->left!=nullptr)
 	{
 		arr= treeToArr(tree, counter, arr, current->left);
 	}
-	arr[counter]= &current;
+	arr[counter]= current;
 	counter++;
 	if (current->right!=nullptr)
 	{
 		arr=treeToArr(tree, counter, arr, current);
 	}
 	return arr;
-};
+}
 
 template<typename K, typename V>
 typename Tree<K,V>::Node** mergeArrs (Tree<K,V> tree, typename Tree<K,V>::Node** merged, typename Tree<K,V>::Node** arr1, typename Tree<K,V>::Node** arr2, int size1, int size2)
@@ -577,7 +577,7 @@ typename Tree<K,V>::Node** mergeArrs (Tree<K,V> tree, typename Tree<K,V>::Node**
 		}
 	}
 	return merged;
-};
+}
 
 template<typename K, typename V>
 void arrToTree(typename Tree<K,V>::Node** arr, int start, int end, Tree<K,V> tree)
@@ -595,23 +595,25 @@ void arrToTree(typename Tree<K,V>::Node** arr, int start, int end, Tree<K,V> tre
 	tree.insert(arr[mid]->key, arr[mid]->value);
 	arrToTree(arr, mid+1, end, tree);
 	return;
-};
+}
 
 template<typename K, typename V>
 Tree<K, V> unite(Tree<K, V> tree1, Tree<K, V> tree2) {
 	Tree<K, V> new_tree = Tree<K, V>(tree1.compare);
-	typename Tree<K,V>::Node** arr1= new typename Tree<K,V>::Node*[tree1.left_num + tree1.right_num + 1];
-	typename Tree<K,V>::Node** arr2= new typename Tree<K,V>::Node*[tree2.left_num + tree2.right_num + 1];
-	arr1= treeToArr(tree1, 0, arr1, tree1->smallest);
-	arr2= treeToArr(tree2, 0, arr2, tree2->smallest);
-	typename Tree<K,V>::Node** mergedArr= new typename Tree<K,V>::Node*[tree1.left_num + tree1.right_num + tree2.left_num + tree2.right_num + 2];
-	mergedArr= mergeArrs(new_tree, mergedArr, arr1, arr2, tree1.left_num + tree1.right_num + 1, tree2.left_num + tree2.right_num + 1);
-	arrToTree(mergedArr, 0, tree1.left_num + tree1.right_num + tree2.left_num + tree2.right_num + 1, new_tree);
+	typename Tree<K,V>::Node* root1=tree1.get_root();
+	typename Tree<K,V>::Node* root2=tree2.get_root();
+	typename Tree<K,V>::Node** arr1= new typename Tree<K,V>::Node*[root1->left_num + root1->right_num + 1];
+	typename Tree<K,V>::Node** arr2= new typename Tree<K,V>::Node*[root2->left_num + root2->right_num + 1];
+	arr1= treeToArr(tree1, 0, arr1, root1->smallest);
+	arr2= treeToArr(tree2, 0, arr2, root2->smallest);
+	typename Tree<K,V>::Node** mergedArr= new typename Tree<K,V>::Node*[root1->left_num + root1->right_num + root2->left_num + root2->right_num + 2];
+	mergedArr= mergeArrs(new_tree, mergedArr, arr1, arr2, root1->left_num + root1->right_num + 1, root2->left_num + root2->right_num + 1);
+	arrToTree(mergedArr, 0, root1->left_num + root1->right_num + root2->left_num + root2->right_num + 1, new_tree);
 	delete[] arr1;
 	delete[] arr2;
 	delete[] mergedArr;
 	return new_tree;
-};
+}
 
 
 
