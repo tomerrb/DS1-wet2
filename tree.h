@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #ifndef TREE_H
 #define TREE_H
 
@@ -238,7 +239,7 @@ private:
 
 	K& get_ith_value_new(Node* node, int i)
 	{
-		if (node->left_num >= i)
+		if (node->left_num > i)
 			return get_ith_value_new(node->left, i);
 		if (i == node->left_num)
 			return node->key;
@@ -328,6 +329,7 @@ private:
 			node->value = node->left->value;
 			node->left->key = copy_key;
 			node->left->value = copy_value;
+			node->left_num = node->left_num - 1;
 			remove_node(node, node->left, key);
 		}
 		else if (node->left == nullptr && node->right != nullptr) {
@@ -337,12 +339,15 @@ private:
 			node->value = node->right->value;
 			node->right->key = copy_key;
 			node->right->value = copy_value;
+			node->right_num = node->right_num - 1;
 			remove_node(node, node->right, key);
 		}
 		else {
 			Node* copy = node->right;
+			node->right_num = node->right_num - 1;
 			int check = 0;
 			while (copy->left) {
+				copy->left_num = copy->left_num - 1;
 				check = 1;
 				parent = copy;
 				copy = copy->left;
@@ -487,8 +492,11 @@ Tree():
 		return get_value_new(root, key);
 	}
 
-	K& get_ith_value(int i) {
-		return get_ith_value_new(root, i);
+	bool get_ith_value(int i, K* res) {
+		if (i > root->left_num + root->right_num)
+			return false;
+		res[0] = get_ith_value_new(root, i);
+		return true;
 	}
 
 	bool smallest(const K& key) const
