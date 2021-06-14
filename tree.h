@@ -513,47 +513,142 @@ Tree():
 	
 };
 
+// template<typename K, typename V>
+// Tree<K, V> uniteRec(Tree<K,V> merged ,Tree<K, V> tree1, Tree<K, V> tree2, typename Tree<K, V>::Node* current1, typename Tree<K,V>::Node* current2)
+// {
+// 	if (!current1 || !current2)
+// 	{
+// 		return merged;
+// 	}
+// 	if (current1->left!=nullptr)
+// 	{
+// 		merged= uniteRec(merged, tree1, tree2, current1->left, current2);
+// 	}
+// 	if (current2->left!= nullptr)
+// 	{
+// 		merged= uniteRec(merged, tree1, tree2, current1, current2->left)
+// 	}
+// 	if (merged.compare(current1, current2) < 0)
+// 	{
+
+// 	}
+// }
+
 template<typename K, typename V>
-Tree<K, V> uniteRec(Tree<K,V> merged ,Tree<K, V> tree1, Tree<K, V> tree2, typename Tree<K, V>::Node* current1, typename Tree<K,V>::Node* current2)
+typename Tree<K,V>::Node** treeToArr (Tree<K,V> tree, int counter, typename Tree<K,V>::Node** arr, typename Tree<K,V>::Node* current)
 {
-	if (!current1 || !current2)
+	if (!current)
 	{
-		return merged;
+		return;
 	}
-	if (current1->left!=nullptr)
+	if (current->left!=nullptr)
 	{
-		merged= uniteRec(merged, tree1, tree2, current1->left, current2);
+		arr= treeToArr(tree, counter, arr, current->left);
 	}
-	if (current2->left!= nullptr)
+	arr[counter]= &current;
+	counter++;
+	if (current->right!=nullptr)
 	{
-		merged= uniteRec(merged, tree1, tree2, current1, current2->left)
+		arr=treeToArr(tree, counter, arr, current);
 	}
-	if (merged.compare(current1, current2) < 0)
+	return arr;
+};
+
+template<typename K, typename V>
+Tree<K,V>::Node** mergeArrs (Tree<K,V> tree, Node** merged, Tree<K,V>::Node** arr1, Tree<K,V>::Node** arr2, int size1, int size2)
+{
+	int counter1=0;
+	int counter2=0;
+	int counter=0;
+	for (int i=0; i<(size1 + size2); i++)
 	{
-		
+		if (counter1==(size1-1) || counter2==(size2-1))
+		{
+			counter=i;
+			break;
+		}
+		if (tree.compare(arr1[counter1]->key, arr2[counter2]->key) < 0)
+		{
+			merged[i]=arr1[counter1];
+			counter1++;
+			continue;
+		}
+		if (tree.compare(arr1[counter1]->key, arr2[counter2]->key) > 0)
+		{
+			merged[i]=arr2[counter2];
+			counter2++;
+			continue;
+		}
 	}
+	if (counter1==(size1-1))
+	{
+		for (int i=counter; i<(size1 + size2); i++)
+		{
+			merged[i]= arr1[counter1];
+			counter1++;
+		}
+	}
+	if (counter2==(size2-1))
+	{
+		for (int i=counter; i<(size1 + size2); i++)
+		{
+			merged[i]= arr2[counter2];
+			counter2++;
+		}
+	}
+	return merged;
+}
+
+template<typename K, typename V>
+void arrToTree(Tree<K,V>::Node** arr, int start, int end, Tree<K,V> tree)
+{
+	if (start>end)
+	{
+		return;
+	}
+	int mid= (end+start)/2;
+	if ((start+end)%2 == 0 && (start+end)!=2 && start != end)
+    {
+        mid++;
+    }
+	arrToTree(arr, start, mid-1, tree);
+	tree.insert(arr[mid]->key, arr[mid]->value);
+	arrToTree(arr, mid+1, end, tree);
+	return;
 }
 
 template<typename K, typename V>
 Tree<K, V> unite(Tree<K, V> tree1, Tree<K, V> tree2) {
 	Tree<K, V> new_tree = Tree<K, V>(tree1.compare);
-	Node* current1= tree1->smallest;
-	Node* current2= tree2->smallest;
-	Node* last1= current1;
-	Node* last2= current2;
-	while ((current1 != tree1->biggest) || (current2 != tree2->biggest))
-	{
-		int is_bigger=new_tree.compare(current1->key, current2->key);
-		if (is_bigger>0)
-		{
-			new_tree.insert(current2->key,current2->value);
-			last2=current2;
-			current2=current2->parent;
-		}
-	}
-	
-	
+	Tree<K,V>::Node** arr1= new Tree<K,V>::Node*[tree1.left_num + tree1.right_num + 1];
+	Tree<K,V>::Node** arr2= new Tree<K,V>::Node*[tree2.left_num + tree2.right_num + 1];
+	arr1= treeToArr(tree1, 0, arr1, tree1->smallest);
+	arr2= treeToArr(tree2, 0, arr2, tree2->smallest);
+	Node** mergedArr= new Node*[tree1.left_num + tree1.right_num + tree2.left_num + tree2.right_num + 2];
+	mergedArr= mergeArrs(new_tree, mergedArr, arr1, arr2, tree1.left_num + tree1.right_num + 1, tree2.left_num + tree2.right_num + 1);
+	arrToTree(mergedArr, 0, tree1.left_num + tree1.right_num + tree2.left_num + tree2.right_num + 1, new_tree);
+	delete[] arr1;
+	delete[] arr2;
+	delete[] mergedArr;
 	return new_tree;
+	//////////
+	// Node* current1= tree1->smallest;
+	// Node* current2= tree2->smallest;
+	// Node* last1= current1;
+	// Node* last2= current2;
+	// while ((current1 != tree1->biggest) || (current2 != tree2->biggest))
+	// {
+	// 	int is_bigger=new_tree.compare(current1->key, current2->key);
+	// 	if (is_bigger>0)
+	// 	{
+	// 		new_tree.insert(current2->key,current2->value);
+	// 		last2=current2;
+	// 		current2=current2->parent;
+	// 	}
+	// }
+	
+	
+	// return new_tree;
 };
 
 
