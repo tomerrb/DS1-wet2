@@ -61,3 +61,4 @@ void Quit(void** DS) {
 	delete (CarDealershipManager*)(*DS);
 	*DS = nullptr;
 }
+

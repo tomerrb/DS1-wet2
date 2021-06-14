@@ -1,13 +1,13 @@
 #include "Union.h"
 
 int compare_int_keys(int key1, int key2) {
-	return key2 - key1;
+	return key1 - key2;
 }
 
 int compare_double_keys(doubleInt key1, doubleInt key2) {
 	if (key1.get_score() == key2.get_score())
-		return key2.get_number() - key1.get_number();
-	return key2.get_score() - key1.get_score();
+		return key1.get_number() - key2.get_number();
+	return key1.get_score() - key2.get_score();
 }
 
 
@@ -79,11 +79,17 @@ void Union::Agency::UniteAgencies(Union::Agency* agency) {
 	this->find()->Unite(agency->find());
 }
 
-int Union::Agency::GetIthSoldTypeNew(int i) {
-	doubleInt copy = final_tree.get_ith_value(i);
-	return copy.get_number();
+bool Union::Agency::GetIthSoldTypeNew(int i, int* res) {
+	doubleInt* copy = (doubleInt*)malloc(sizeof(doubleInt));
+	if (final_tree.get_ith_value(i, copy)) {
+		res[0] = copy[0].get_number();
+		free(copy);
+		return true;
+	}
+	free(copy);
+	return false;
 }
 
-int Union::Agency::GetIthSoldType(int i) {
-	return this->find()->GetIthSoldTypeNew(i);
+bool Union::Agency::GetIthSoldType(int i, int* res) {
+	return this->find()->GetIthSoldTypeNew(i, res);
 }

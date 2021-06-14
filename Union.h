@@ -49,8 +49,8 @@ namespace Union {
 		void SellCar(int typeID, int k);
 		void UniteAgencies(Agency* agency);
 		void Unite(Agency* agency);
-		int GetIthSoldType(int i);
-		int GetIthSoldTypeNew(int i);
+		bool GetIthSoldType(int i, int* res);
+		bool GetIthSoldTypeNew(int i, int* res);
 	};
 	
 	
