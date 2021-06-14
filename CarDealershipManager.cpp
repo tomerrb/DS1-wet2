@@ -1,6 +1,6 @@
 #include "CarDealershipManager.h"
 
-#include <stdlib.h>
+//#include <stdlib.h>
 #define MAXSIZE 10
 
 CarDealershipManager::CarDealershipManager() :
@@ -46,13 +46,9 @@ StatusType CarDealershipManager::UniteAgencies(int agencyID1, int agencyID2) {
 StatusType CarDealershipManager::GetIthSoldType(int agencyID, int i, int* res) {
 	if (agencyID >= current_size)
 		return FAILURE;
-	res[0] = agency[agencyID]->GetIthSoldType(i);
-	return SUCCESS;
+	if (agency[agencyID]->GetIthSoldType(i, res))
+		return SUCCESS;
+	return FAILURE;
 }
-
-
-
-
-
 
 
