@@ -515,34 +515,34 @@ Tree():
 
 
 template<typename K, typename V>
-typename Tree<K,V>::Node** treeToArr (Tree<K,V> tree, int counter, typename Tree<K,V>::Node** arr, typename Tree<K,V>::Node* current)
+void treeToArr (const Tree<K,V>& tree, int* counter, typename Tree<K,V>::Node** arr, typename Tree<K,V>::Node* current)
 {
 	if (!current)
 	{
-		return nullptr;
+		return;
 	}
 	if (current->left!=nullptr)
 	{
-		arr= treeToArr(tree, counter, arr, current->left);
+		treeToArr(tree, counter, arr, current->left);
 	}
-	arr[counter]= current;
-	counter++;
+	arr[*counter]= current;
+	(*counter)++;
 	if (current->right!=nullptr)
 	{
-		arr=treeToArr(tree, counter, arr, current);
+		treeToArr(tree, counter, arr, current->right);
 	}
-	return arr;
+	return;
 }
 
 template<typename K, typename V>
-typename Tree<K,V>::Node** mergeArrs (Tree<K,V> tree, typename Tree<K,V>::Node** merged, typename Tree<K,V>::Node** arr1, typename Tree<K,V>::Node** arr2, int size1, int size2)
+void mergeArrs (const Tree<K,V>& tree, typename Tree<K,V>::Node** merged, typename Tree<K,V>::Node** arr1, typename Tree<K,V>::Node** arr2, int size1, int size2)
 {
 	int counter1=0;
 	int counter2=0;
 	int counter=0;
 	for (int i=0; i<(size1 + size2); i++)
 	{
-		if (counter1==(size1-1) || counter2==(size2-1))
+		if (counter1==size1 || counter2==size2)
 		{
 			counter=i;
 			break;
@@ -551,36 +551,43 @@ typename Tree<K,V>::Node** mergeArrs (Tree<K,V> tree, typename Tree<K,V>::Node**
 		{
 			merged[i]=arr1[counter1];
 			counter1++;
+			counter=i;
 			continue;
 		}
 		if (tree.compare(arr1[counter1]->key, arr2[counter2]->key) > 0)
 		{
 			merged[i]=arr2[counter2];
 			counter2++;
+			counter=i;
 			continue;
 		}
+		counter=i;
 	}
-	if (counter1==(size1-1))
+	if (counter1==(size1))
 	{
-		for (int i=counter; i<(size1 + size2); i++)
-		{
-			merged[i]= arr1[counter1];
-			counter1++;
-		}
-	}
-	if (counter2==(size2-1))
-	{
-		for (int i=counter; i<(size1 + size2); i++)
+		for (int i=counter; i<=(size1 + size2 - 1); i++)
 		{
 			merged[i]= arr2[counter2];
 			counter2++;
 		}
 	}
-	return merged;
+	if (counter2==(size2))
+	{
+		if (counter1==(size1))
+		{
+			return;
+		}
+		for (int i=counter; i<=(size1 + size2 - 1); i++)
+		{
+			merged[i]= arr1[counter1];
+			counter1++;
+		}
+	}
+	return;
 }
 
 template<typename K, typename V>
-void arrToTree(typename Tree<K,V>::Node** arr, int start, int end, Tree<K,V> tree)
+void arrToTree(typename Tree<K,V>::Node** arr, int start, int end, Tree<K,V>& tree)
 {
 	if (start>end)
 	{
@@ -604,10 +611,12 @@ Tree<K, V> unite(Tree<K, V> tree1, Tree<K, V> tree2) {
 	typename Tree<K,V>::Node* root2=tree2.get_root();
 	typename Tree<K,V>::Node** arr1= new typename Tree<K,V>::Node*[root1->left_num + root1->right_num + 1];
 	typename Tree<K,V>::Node** arr2= new typename Tree<K,V>::Node*[root2->left_num + root2->right_num + 1];
-	arr1= treeToArr(tree1, 0, arr1, root1->smallest);
-	arr2= treeToArr(tree2, 0, arr2, root2->smallest);
+	int counter=0;
+	treeToArr(tree1, &counter, arr1, root1);
+	counter=0;
+	treeToArr(tree2, &counter, arr2, root2);
 	typename Tree<K,V>::Node** mergedArr= new typename Tree<K,V>::Node*[root1->left_num + root1->right_num + root2->left_num + root2->right_num + 2];
-	mergedArr= mergeArrs(new_tree, mergedArr, arr1, arr2, root1->left_num + root1->right_num + 1, root2->left_num + root2->right_num + 1);
+	mergeArrs(new_tree, mergedArr, arr1, arr2, root1->left_num + root1->right_num + 1, root2->left_num + root2->right_num + 1);
 	arrToTree(mergedArr, 0, root1->left_num + root1->right_num + root2->left_num + root2->right_num + 1, new_tree);
 	delete[] arr1;
 	delete[] arr2;
