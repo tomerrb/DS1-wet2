@@ -38,12 +38,15 @@ void Union::Agency::change_parent(Union::Agency* agency) {
 
 
 void Union::Agency::SellCar(int typeID, int k) {
-	if (parent != nullptr)
+	if (parent != nullptr) {
 		this->find()->SellCar(typeID, k);
+		return;
+	}
 	if (!score_tree.contains(typeID)) {
 		score_tree.insert(typeID, k);
-		doubleInt new_double = doubleInt(typeID, k);
+		doubleInt new_double = doubleInt(k, typeID);
 		final_tree.insert(new_double, new_double);
+		return;
 	}
 	int old_score = score_tree.get_value(typeID);
 	int new_score = old_score + k;
@@ -57,22 +60,76 @@ void Union::Agency::SellCar(int typeID, int k) {
 }
 
 void Union::Agency::Unite(Union::Agency* agency) {
-	Tree<int, int> new_score_tree = unite(score_tree, agency->score_tree);
-	Tree<doubleInt, doubleInt> new_final_tree = unite(final_tree, agency->final_tree);
-	//We need to do "free" to old trees???
-	if (rank >= agency->rank) {
-		rank = rank + agency->rank;
-		agency->rank = 0;
-		agency->parent = this;
-		score_tree = new_score_tree;
-		final_tree = new_final_tree;
+	if (score_tree.get_root() != nullptr && agency->score_tree.get_root() != nullptr) {
+		Tree<int, int> new_score_tree(unite(score_tree, agency->score_tree));
+		Tree<doubleInt, doubleInt> new_final_tree(unite(final_tree, agency->final_tree));
+
+		score_tree.~Tree();
+		final_tree.~Tree();
+
+		agency->score_tree.~Tree();
+		agency->final_tree.~Tree();
+
+		if (rank >= agency->rank) {
+			rank = rank + agency->rank;
+			agency->rank = 0;
+			agency->parent = this;
+			score_tree = new_score_tree;
+			final_tree = new_final_tree;
+			return;
+		}
+		agency->rank = rank + agency->rank;
+		rank = 0;
+		parent = agency;
+		agency->score_tree = new_score_tree;
+		agency->final_tree = new_final_tree;
 		return;
 	}
-	agency->rank = rank + agency->rank;
-	rank = 0;
-	parent = agency;
-	agency->score_tree = new_score_tree;
-	agency->final_tree = new_final_tree;
+	if (score_tree.get_root() == nullptr && agency->score_tree.get_root() == nullptr) {
+		if (rank >= agency->rank) {
+			rank = rank + agency->rank;
+			agency->rank = 0;
+			agency->parent = this;
+			return;
+		}
+		agency->rank = rank + agency->rank;
+		rank = 0;
+		parent = agency;
+		return;
+	}
+	if (score_tree.get_root() == nullptr) {
+		if (rank >= agency->rank) {
+			rank = rank + agency->rank;
+			agency->rank = 0;
+			agency->parent = this;
+			score_tree = agency->score_tree;
+			final_tree = agency->final_tree;
+			agency->score_tree.~Tree();
+			agency->final_tree.~Tree();
+			return;
+		}
+		agency->rank = rank + agency->rank;
+		rank = 0;
+		parent = agency;
+		return;
+	}
+	else {
+		if (rank >= agency->rank) {
+			rank = rank + agency->rank;
+			agency->rank = 0;
+			agency->parent = this;
+			
+			return;
+		}
+		agency->rank = rank + agency->rank;
+		rank = 0;
+		parent = agency;
+		agency->score_tree = score_tree;
+		agency->final_tree = final_tree;
+		score_tree.~Tree();
+		final_tree.~Tree();
+		return;
+	}
 }
 
 void Union::Agency::UniteAgencies(Union::Agency* agency) {
