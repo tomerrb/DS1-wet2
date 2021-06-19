@@ -311,6 +311,7 @@ private:
 					parent->right = nullptr;
 				else
 					parent->left = nullptr;
+				delete node;
 				node = nullptr;
 			}
 
@@ -318,10 +319,12 @@ private:
 			else {
 				if (parent->right == node) {
 					parent->right = nullptr;
+					delete node;
 					node = nullptr;
 				}
 				else {
 					parent->left = nullptr;
+					delete node;
 					node = nullptr;
 				}
 			}
@@ -508,6 +511,8 @@ Tree():
 	}
 
 	bool get_ith_value(int i, K* res) {
+		if (root == nullptr)
+			return false;
 		if (i > root->left_num + root->right_num)
 			return false;
 		res[0] = get_ith_value_new(root, i);
@@ -683,3 +688,4 @@ Tree<K, V> unite(Tree<K, V> tree1, Tree<K, V> tree2) {
 
 
 #endif
+
