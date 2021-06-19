@@ -37,6 +37,21 @@ public:
 		{
 		}
 
+		Node(const K& key, const V& value, Node* smallest, Node* biggest, Node* left, Node* right, Node* parent, int height, int left_num, int right_num)
+			: key(key)
+			, value(value)
+			, smallest(smallest)
+			, biggest(biggest)
+			, left(left)
+			, right(right)
+			, parent(parent)
+			, height(height)
+			, left_num(left_num)
+			, right_num(right_num)
+		{
+		}
+
+
 		int balance() {
 			return (left != nullptr ? left->height : 0) - (right != nullptr ? right->height : 0);
 		}
@@ -505,12 +520,52 @@ Tree():
 	}
 
 
+
 	K& nearest(const K& key) const
 	{
 		return nearest_new(root, root, 1, key);
 	}
 
 	
+
+	void set_parent(Node* parent, Node* child) {
+		child->parent = parent;
+		if (child->left != nullptr) {
+			set_parent(child, child->left);
+		}
+		if (child->right != nullptr) {
+			set_parent(child, child->right);
+		}
+	}
+
+	static Node* copyNodes(Node* t)
+	{
+		if (t != nullptr)
+		{
+			Node* left = copyNodes(t->left);
+			Node* right = copyNodes(t->right);
+			return new Node(t->key, t->value, nullptr, nullptr, left, right, nullptr, t->height, t->left_num, t->right_num);
+		}
+		else
+		{
+			return nullptr;
+		}
+	}
+
+	Tree(const Tree& rhs)
+	{
+		root = copyNodes(rhs.root);
+		compare = rhs.compare;
+		if (root != nullptr)
+			set_parent(nullptr, root);
+	}
+
+	void operator=(const Tree& rhs) {
+		root = copyNodes(rhs.root);
+		compare = rhs.compare;
+		if (root != nullptr)
+			set_parent(nullptr, root);
+	}
 };
 
 
